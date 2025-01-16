@@ -10,7 +10,7 @@
       "datefmt": "%Y-%m-%dT%H:%M:%S%z"
     },
     "json": {
-      "()": "pipeline_logger.JSONFormatter",
+      "()": "museum_pipeline.pipeline_logger.JSONFormatter",
       "fmt_keys": {
         "level": "levelname",
         "message": "message",
@@ -40,7 +40,7 @@
       "class": "logging.handlers.RotatingFileHandler",
       "level": "DEBUG",
       "formatter": "json",
-      "filename": "../../logs/pipeline.jsonl",
+      "filename": "logs/pipeline.jsonl",
       "maxBytes": 10000000,
       "backupCount": 3
     },

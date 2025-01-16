@@ -84,6 +84,7 @@ jobs:
           port: 22
           script: |
             cd museum-pipeline/pipeline
+            mkdir logs
             python3.13 -m venv .venv
             source .venv/bin/activate
             pip install --upgrade pip
