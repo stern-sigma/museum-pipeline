@@ -43,7 +43,7 @@ jobs:
           cd pipeline
           python -m pip install --upgrade pip
           pip install -e .
-      - run: pylint src/museum_pipeline/*.py --fail-under 8
+          pylint src/museum_pipeline/*.py --fail-under 8
   deploy:
     needs: [test, lint]
     runs-on: ubuntu-latest
