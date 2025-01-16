@@ -49,6 +49,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: myenvironment
     steps:
+      - name: Check secrets availability
+        run: |
+          if [[ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]]; then
+            echo "SSH_PRIVATE_KEY is not set"
+          else
+            echo "SSH_PRIVATE_KEY is available"
+          fi
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
