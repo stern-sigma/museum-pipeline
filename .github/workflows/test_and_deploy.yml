@@ -22,7 +22,8 @@ jobs:
           cd pipeline
           python -m pip install --upgrade pip
           pip install -e .
-      - run: pytest -x
+      - name: Test
+        run: pytest -x
   lint:
     runs-on: ubuntu-latest
     steps:  
@@ -43,19 +44,15 @@ jobs:
           cd pipeline
           python -m pip install --upgrade pip
           pip install -e .
+      - name: Lint
+        run: |
+          cd pipeline
           pylint src/museum_pipeline/*.py --fail-under 8
-  deploy:
+  build:
     needs: [test, lint]
     runs-on: ubuntu-latest
     environment: myenvironment
     steps:
-      - name: Check secrets availability
-        run: |
-          if [[ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]]; then
-            echo "SSH_PRIVATE_KEY is not set"
-          else
-            echo "SSH_PRIVATE_KEY is available"
-          fi
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -71,7 +68,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
-  build:
+  deploy:
     needs: [deploy]
     runs-on: ubuntu-latest
     steps:
