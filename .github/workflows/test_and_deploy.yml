@@ -69,7 +69,7 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
   deploy:
-    needs: [deploy]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
