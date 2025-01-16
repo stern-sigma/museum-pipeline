@@ -91,6 +91,6 @@ jobs:
             pip install -e .
             fuser -k 5432/tcp
             fuser -k 9092/tcp
-            nohup python3.13 src/museum_pipeline/lms_kafka_pipeline.py -store & disown
-            nohup python3.13 src/museum_pipeline/lmnh_kafka_pipeline.py -store & disown
+            nohup python3.13 src/museum_pipeline/lms_kafka_pipeline.py -store >> logs/pipeline.jsonl 2>&1 &
             exit
+            nohup python3.13 src/museum_pipeline/lmnh_kafka_pipeline.py -store >> logs/pipeline.jsonl 2>&1 &
