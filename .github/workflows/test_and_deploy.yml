@@ -1,0 +1,92 @@
+name: Test and Deploy
+run-name: ${{ github.actor }} is attempting to deploy to the cloud.
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with: 
+          python-version: '3.13'
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          cd pipeline
+          python -m pip install --upgrade pip
+          pip install -e .
+      - run: pytest -x
+  lint:
+    runs-on: ubuntu-latest
+    steps:  
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with: 
+          python-version: '3.13'
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          cd pipeline
+          python -m pip install --upgrade pip
+          pip install -e .
+      - run: pylint src/museum_pipeline/*.py --fail-under 8
+  deploy:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            pipeline/src
+            pipeline/pyproject.toml
+      - name: Deploy to ec2
+        if: ${{ success() }}
+        uses: easingthemes/ssh-deploy@main 
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+  build:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            sudo apt update
+            sudo apt upgrade
+            sudo apt install software-properties-common
+            sudo add-apt-repository ppa/deadsnakes/ppa
+            sudo apt update
+            sudo apt install python3.13 python3.13-pip python3.13-venv git
+            cd pipeline
+            python3.13 -m venv .venv
+            source .venv/bin/activate
+            pip install --upgrade pip
+            pip install -e .
+            fuser -k 5432/tcp
+            fuser -k 9092/tcp
+            nohup python3.13 src/museum_pipeline/lms_kafka_pipeline.py -store 2>&1 &
+            nohup python3.13 src/museum_pipeline/lmnh_kafka_pipeline.py -store 2>&1 &
