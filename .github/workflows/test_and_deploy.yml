@@ -83,14 +83,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo apt update
-            sudo apt upgrade
-            sudo apt install software-properties-common
-            sudo add-apt-repository ppa/deadsnakes/ppa
-            sudo apt update
-            sudo apt install python3.13 python3.13-pip python3.13-venv git
-            cd pipeline
-            pwd
+            cd museum-pipeline/pipeline
             python3.13 -m venv .venv
             source .venv/bin/activate
             pip install --upgrade pip
