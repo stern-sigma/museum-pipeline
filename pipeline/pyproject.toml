@@ -9,7 +9,7 @@ version = "1.0"
 authors = [
 {name = "Samuel Stern"}
 ]
-dependecies = [
+dependencies = [
 "boto3",
 "psycopg2-binary",
 "python-dotenv",
