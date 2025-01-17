@@ -17,6 +17,8 @@ It was designed for the __Liverpool Museum of Natural History__, and handles:
     - An [AWS S3 bucket](https://aws.amazon.com/s3/) with .csv files formatted as expected (see below).
   - For Kafka version:
     - A [Kafka Stream](https://www.confluent.io/learn/kafka-streams/https://www.confluent.io/learn/kafka-streams/) with the [topic](https://developer.confluent.io/courses/apache-kafka/topics/) `lmnh`, and messages formatted as below.
+  - For automated deployment:
+    - A GitHub account
 
 ### Requirements:
   - Python >=3.13
@@ -88,15 +90,15 @@ KAFKA_GROUP_ID=<arbitary consumer group name>
 ### Seed the database
 1. In the `pipeline` directory, run the following command:
 ```
-bash init-db.sh
+bash scripts/init-db.sh
 ```
 
 
 ## Deploy
 ### S3 bucket
-Uploading from an S3 bucket is simple. You should have already configured the name in your environment variables. After that there is only one command to run:
+Uploading from an S3 bucket is simple. You should have already configured the name in your environment variables. After that there is only one command to run from the `pipeline` directory:
 ```
-python3 pipeline/pipeline.py [
+python3 pipeline.py [
   -config_logging (enable command-line configuration of logging)
     -stdout [true/false] (log to console, false by default)
     -file [true/false] (log to pipeline/logs/pipeline.jsonl, true by default)
@@ -114,33 +116,10 @@ python3 kafka_pipeline.py [
 ```
 
 ### EC2
-In order to deploy the pipeline to EC2, follow the following steps:
-1. SSH into you EC2 from `pipeline` using
+Execute the following command from the `pipeline` directory:
 ```
-bash connect-ec2.sh
+bash scripts/init-ec2.sh
 ```
-2. Run the following commands, granting permissions where necessary:
-```
-sudo apt update
-sudo apt upgrade
-sudo apt install software-properties-common
-sudo add-apt-repository ppa/deadsnakes/ppa
-sudo apt update
-sudo apt install python3.13 python3.13-pip python3.13-venv git 
-git clone <this repository>
-cd Coursework-Data-Engineering-Week-1/pipeline
-python3.13 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-3. At this point, you will need to copy your `.env` file into EC2 `pipeline` directory. This will only work once you have.
-4. You are now free to run either version in the EC2.
-
-In order to set up the Kafka pipeline to run indefinitely, run:
-```
-nohup python3.13 kafka_pipeline -store & disown
-```
-
 ## Dev info
 
 ### Advanced logging configuration
