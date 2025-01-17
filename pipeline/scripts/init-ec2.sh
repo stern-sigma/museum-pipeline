@@ -6,6 +6,7 @@ ssh -t -i ec2-key.pem ubuntu@${EC2_DNS} "
   sudo add-apt-repository ppa:deadsnakes/ppa -y
   sudo apt update -y
   sudo apt install python3.13 python3.13-venv git -y
+  rm -rf museum-pipeline
   git clone https://github.com/stern-sigma/museum-pipeline --no-checkout
   cd museum-pipeline
   git sparse-checkout init --cone
@@ -19,11 +20,14 @@ ssh -t -i ec2-key.pem ubuntu@${EC2_DNS} "
   pip install --upgrade pip
   pip install -e .
 "
-scp -i ec2-key.pem .env ubuntu@${EC_DNS}:museum-pipeline/pipeline
+scp -i ec2-key.pem .env ubuntu@${EC2_DNS}:museum-pipeline/pipeline
 ssh -t -i ec2-key.pem ubuntu@${EC2_DNS} "
   cd museum-pipeline/pipeline
+  pwd
+  pkill -15 python3.13
   source .venv/bin/activate
-  nohup python3.13 lms_kafka_pipeline.py -store >>logs/pipeline.jsonl 2>&1 &
-  nohup python3.13 lmnh_kafka_pipeline.py -store >>logs/pipeline.jsonl 2>&1 &
+  nohup python3.13 -m museum_pipeline.lms_kafka_pipeline -store >> logs/pipeline.jsonl 2>&1 & disown
+  nohup python3.13 -m museum_pipeline.lmnh_kafka_pipeline -store >> logs/pipeline.jsonl 2>&1 & disown
+  echo 'Initialsed kafka pipeline'
 "
 git sparse-checkout disable
