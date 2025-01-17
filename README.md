@@ -137,7 +137,3 @@ bash scripts/init-ec2.sh
 
 ### Database exploration
 On account of the fact that `psql` is long-winded, devs wishing to interrogate the database may avail themselves of the `connect-db.sh` script in the `pipeline` directory.
-
----
-[![badge](./.github/badges/code_quality.svg)](./code_review/report.json)
-[![badge](./.github/badges/total_errors.svg)](./code_review/report.json)
