@@ -120,8 +120,10 @@ Execute the following command from the `pipeline` directory:
 ```
 bash scripts/init-ec2.sh
 ```
+This will build the application and deploy the Kafka pipelines for LMS and LMNH.
 ## Dev info
-
+### CI/CD 
+This repository supports a CI/CD workflow.
 ### Advanced logging configuration
   - For most use cases, adjusting the handlers used by the `queue_handler` in `pipeline/conf_logging.json` should be sufficient.
   - Also feel free to modify the file more generally to your needs.

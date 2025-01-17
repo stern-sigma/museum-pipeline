@@ -23,12 +23,10 @@ ssh -t -i ec2-key.pem ubuntu@${EC2_DNS} "
 scp -i ec2-key.pem .env ubuntu@${EC2_DNS}:museum-pipeline/pipeline
 ssh -t -i ec2-key.pem ubuntu@${EC2_DNS} "
   cd museum-pipeline/pipeline
-  pwd
   pkill -15 python3.13
   source .venv/bin/activate
   nohup python3.13 -m museum_pipeline.lms_kafka_pipeline -store >> logs/pipeline.jsonl 2>&1 & disown
   nohup python3.13 -m museum_pipeline.lmnh_kafka_pipeline -store >> logs/pipeline.jsonl 2>&1 & disown
-  echo 'Initialsed kafka pipeline'
-  cat logs/pipeline.jsonl
+  which python3.13 > /dev/null
 "
 git sparse-checkout disable
