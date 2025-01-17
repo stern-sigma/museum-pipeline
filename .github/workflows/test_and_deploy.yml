@@ -57,8 +57,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            src
-            pyproject.toml
+            pipeline/src
+            pipeline/pyproject.toml
       - name: Deploy to ec2
         if: ${{ success() }}
         uses: easingthemes/ssh-deploy@main 
@@ -67,7 +67,7 @@ jobs:
           ARGS: "-rlgoDzvc -i"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_TARGET }}
+          TARGET: pipeline
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
